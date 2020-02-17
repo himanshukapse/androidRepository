@@ -1,0 +1,154 @@
+package com.example.loginusingfirebase;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.FirebaseError;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ListUserActivity extends Activity {
+
+    private RecyclerView recyclerView;
+    private FirebaseDatabase firebaseDatabase;
+    private List<EmployeePOJO> employees;
+    private ListAdapter listAdapter;
+    private FirebaseUser firebaseUser;
+    String id;
+    private FirebaseAuth firebaseAuth;
+    private EmployeePOJO finalPOJO;
+private DatabaseReference databaseReference;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_list_user);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        databaseReference = firebaseDatabase.getReference("employee");
+       // database.keepSynced(true);
+
+        Log.e("db obj",""+databaseReference);
+        employees = new ArrayList<>();
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(ListUserActivity.this));
+
+
+//        EmployeePOJO employeePOJO = new EmployeePOJO("10100", "jabaa","hahaha");
+//        employees.add(employeePOJO);
+       // String userId = databaseReference.push().getKey();
+        //Log.e("userid",userId);
+
+        id = firebaseUser.getUid();
+        Log.e("LA",id);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                employees.clear();
+                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        String id = snapshot.child("empID").getValue(String.class);
+                        String name = snapshot.child("empName").getValue(String.class);
+                        String dept = snapshot.child("empDepartment").getValue(String.class);
+                        String un = snapshot.child("uniqueKey").getValue(String.class);
+
+                        EmployeePOJO employeePOJO = new EmployeePOJO(un, id, name, dept);
+                        employees.add(employeePOJO);
+                    }
+
+//                Log.e("Name",name);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ListUserActivity.this,databaseError.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Log.e("Size of list: ", String.valueOf(employees.size()));
+
+        listAdapter = new ListAdapter(ListUserActivity.this, employees);
+
+        recyclerView.setAdapter(listAdapter);
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //        employee1 = new EmployeePOJO("001", "hk", "sample dept1");
+//        employee2 = new EmployeePOJO("002", "sk", "sample dept2");
+//        employee3 = new EmployeePOJO("002", "sk", "sample dept2");
+//
+//
+//        employees.add(employee1);
+//        employees.add(employee2);
+//        employees.add(employee3);
+
+
+
+
+
+
+
+        // Retreive all the employees from the firebase
+
+
+
+//        database.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//               //employee = dataSnapshot.getValue(EmployeePOJO.class);
+//                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+//                    employees.add(postSnapshot.getValue(EmployeePOJO.class));
+//                }
+//                employeePOJO = (EmployeePOJO[]) employees.toArray();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//              //  new EmployeePOJO[]{new EmployeePOJO(employee.getEmpID(), employee.getEmpName(), employee.getEmpDepartment())};
+//
+//        ListAdapter adapter = new ListAdapter(employeePOJO);
+//        recyclerView.setHasFixedSize(true);
+
+
+
+
