@@ -1,0 +1,66 @@
+
+        Executor newExecutor = Executors.newSingleThreadExecutor();
+
+       myBiometricPrompt = new BiometricPrompt(MainActivity.this, newExecutor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+
+//onAuthenticationError is called when a fatal error occurrs//
+
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                } else {
+
+//Print a message to Logcat//
+
+//                    Log.d(TAG, "An unrecoverable error occurred");
+                }
+            }
+
+//onAuthenticationSucceeded is called when a fingerprint is matched successfully//
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                email ="hk@gmail.com";
+                password = "000000";
+                
+                //Create a method named userAuthentication
+                
+                userAuthenctication(email, password);
+                // sign in
+
+//Print a message to Logcat//
+
+//                Log.d(TAG, "Fingerprint recognised successfully");
+            }
+
+//onAuthenticationFailed is called when the fingerprint doesn’t match//
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Toast.makeText(MainActivity.this, "Can't recognise the fingerprint. Please try again!", Toast.LENGTH_SHORT).show();
+
+//Print a message to Logcat//
+
+ //               Log.d(TAG, "Fingerprint not recognised");
+            }
+        });
+
+//Create the BiometricPrompt instance//
+
+        promptInfo  = new BiometricPrompt.PromptInfo.Builder()
+
+//Add some text to the dialog//
+
+                .setTitle("Login using firebase")
+//                .setSubtitle("")
+                .setDescription("Touch the fingerprint sensor")
+                .setNegativeButtonText("Cancel")
+
+//Build the dialog//
+
+                .build();
+
+        myBiometricPrompt.authenticate(promptInfo);
